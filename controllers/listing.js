@@ -33,6 +33,27 @@ module.exports.showListing = async (req, res) => {
   res.render("listings/show.ejs", { listing });
 };
 
+module.exports.showSearch = (async (req,res)=>{
+ 
+  const searchedCountry = req.query.searchedCountry;
+  // console.log(searchedCountry);
+
+  const regexPattern = new RegExp(searchedCountry, 'i');
+
+  // Find listings matching the regex pattern for the country
+  const allListings = await Listing.find({ country: { $regex: regexPattern } });
+  // console.log(allListings);
+
+
+  if(allListings.length==0){
+      req.flash("error","No listings found for the specified country.");
+      res.redirect("/listings");
+  }else{
+      let country = allListings[0].country;
+      res.render("listings/searchCountry.ejs",{ allListings, country })
+  }
+}); 
+
 module.exports.createListting = async (req, res) => {
   // try{
   //let{title,description,image,price,location,country}=req.body;
